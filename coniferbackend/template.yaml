@@ -1,10 +1,10 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   coniferbackend
 
   Sample SAM Template for coniferbackend
-  
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -28,18 +28,32 @@ Resources:
           Properties:
             Path: /hello
             Method: get
-  
+
   ProjectTable:
     Type: AWS::DynamoDB::Table
-    Properties: 
+    Properties:
       TableName: projectTable
-      AttributeDefinitions: 
+      AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
-      KeySchema: 
+      KeySchema:
         - AttributeName: id
           KeyType: HASH
-      ProvisionedThroughput: 
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+
+  ExpenseTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: expenseTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
 
@@ -53,16 +67,17 @@ Resources:
         - x86_64
       Events:
         GroupAPI:
-          Type: Api 
+          Type: Api
           Properties:
             Path: /api/{proxy+}
             Method: ANY
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ProjectTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExpenseTable
 
 Outputs:
-
   HelloWorldApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"

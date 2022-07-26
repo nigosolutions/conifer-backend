@@ -13,7 +13,7 @@ exports.lambdaHandler = async (event, context) => {
 	try {
 		switch (event.httpMethod) {
 			case "OPTIONS":
-				if (path === "project") {
+				if (path === "project" || path === "expense") {
 					[data, statusCode] = ["Success", 200];
 				} else {
 					[data, statusCode] = ["Error: Invalid Request", 400];
@@ -29,11 +29,16 @@ exports.lambdaHandler = async (event, context) => {
 				if (path === "project") {
 					let body = JSON.parse(event.body);
 					[data, statusCode] = await createProject(body.project);
+				} else if (path === "expense") {
+					let body = JSON.parse(event.body);
+					[data, statusCode] = await addExpense(body.expense);
 				}
 				break;
 			case "GET":
 				if (path === "project") {
 					[data, statusCode] = await getAllProjectDetails();
+				} else if (path === "expense") {
+					[data, statusCode] = await getAllExpenseDetails();
 				}
 				break;
 			case "DELETE":
@@ -112,4 +117,23 @@ async function deleteProject(id) {
 		})
 		.promise();
 	return ["Deleted Project", 200];
+}
+
+async function addExpense(expense) {
+	await docClient
+		.put({
+			TableName: "expenseTable",
+			Item: {
+				id: uuidv4(),
+				...expense,
+			},
+		})
+		.promise();
+
+	return ["Expense Successfully added", 200];
+}
+
+async function getAllExpenseDetails() {
+	const data = await docClient.scan({ TableName: "expenseTable" }).promise();
+	return [data, 200];
 }
