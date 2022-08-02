@@ -57,6 +57,48 @@ Resources:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
 
+  ApprovedExpenseTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: approvedExpenseTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+
+  RejectedExpenseTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: rejectedExpenseTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: userTable
+      AttributeDefinitions:
+        - AttributeName: username
+          AttributeType: S
+      KeySchema:
+        - AttributeName: username
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+
   GroupFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -76,6 +118,12 @@ Resources:
             TableName: !Ref ProjectTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ExpenseTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ApprovedExpenseTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RejectedExpenseTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
 
 Outputs:
   HelloWorldApi:
